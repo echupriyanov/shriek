@@ -1,7 +1,7 @@
 (ns shriek.core
   (:gen-class))
 
-(require 'ring.adapter.jetty)
+(require '[ring.adapter.jetty :as r])
 
 (defn handler [request]
 {:status 200
@@ -13,4 +13,4 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Hello, World!"))
+  (r/run-jetty handler {:port 3000}))
