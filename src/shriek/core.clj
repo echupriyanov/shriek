@@ -13,4 +13,4 @@
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (r/run-jetty handler {:port 3000}))
+  (r/run-jetty handler {:port 3000 :host "localhost"}))
