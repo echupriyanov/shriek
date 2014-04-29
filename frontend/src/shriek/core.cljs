@@ -3,7 +3,7 @@
   (:require-macros [enfocus.macros :as em]))
 
 (defn start []
-  (ef/at ".container" (ef/content "Превед Медвед!")))
+  (ef/at ".container" (ef/content "Враг не пройдет!")))
 
 
 ;; (set! (.-onload js/window) start)

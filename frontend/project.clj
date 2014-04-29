@@ -9,9 +9,9 @@
         :source-paths ["src"]
         :compiler {
           :output-to "resources/js/main.js"
-;          :output-dir "resources/js/out"
-          :optimizations :whitespace
+          :output-dir "resources/js"
+          :optimizations :none
           :pretty-print true
-;          :souce-maps true
+          :source-map true
         }
     }]})
