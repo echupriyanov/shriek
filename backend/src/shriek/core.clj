@@ -4,7 +4,10 @@
   (:use compojure.core
         compojure.handler
         ring.middleware.edn
-        carica.core))
+        carica.core)
+  (:gen-class))
+
+(require '[ring.adapter.jetty :as r])
 
 (defn response [data & [status]]
   {:status (or status 200)
@@ -22,3 +25,8 @@
   (-> compojure-handler
       site
       wrap-edn-params))
+
+(defn -main
+  "I don't do a whole lot ... yet."
+  [& args]
+  (r/run-jetty app {:port 3000 :host "localhost"}))
