@@ -3,8 +3,9 @@ pom.xml.asc
 *jar
 /lib/
 /classes/
-/target/
+/backend/target/
 /checkouts/
+/frontend/resources/js
 .lein-deps-sum
 .lein-repl-history
 .lein-plugins/
