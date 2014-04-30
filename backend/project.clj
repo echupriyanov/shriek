@@ -4,13 +4,33 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
+                 [com.datomic/datomic-free "0.9.4718"]
+;;                 [crypto-password "0.1.3"]
                  [compojure "1.1.6"]
-                 [ring/ring-jetty-adapter "1.3.0-beta1"]
-                 [sonian/carica "1.1.0" :exclusions [[cheshire]]]
+                 [ring-server "0.3.1"]
+                 [lib-noir "0.8.2"]
+                 [markdown-clj "0.9.43"]
+                 [com.taoensso/timbre "3.1.6"]
+                 [com.taoensso/tower "2.0.2"]
+                 [selmer "0.6.6"]
+                 [environ "0.5.0"]
+;;                 [ring/ring-jetty-adapter "1.3.0-beta1"]
+;;                 [sonian/carica "1.1.0" :exclusions [[cheshire]]]
                  [fogus/ring-edn "0.2.0"]]
   :main ^:skip-aot shriek.core
+  :repl-options {:init-ns shriek.repl}
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}}
-  :plugins [[lein-ring "0.8.10"]]
-  :ring {:handler shriek.core/app}
+  :plugins [[lein-ring "0.8.10"]
+            [lein-environ "0.5.0"]]
+  :ring {:handler shriek.handler/app
+         :init    shriek.handler/init
+         :destroy shriek.handler/destroy}
+  :profiles {:uberjar {:aot :all}
+             :production {:ring {:open-browser? false
+                       :stacktraces?  false
+                       :auto-reload?  false}}
+             :dev {:dependencies [[ring-mock "0.1.5"]
+                                  [ring/ring-devel "1.2.2"]]
+                   :env {:dev true}}}
+  :jvm-opts ^:replace ["-Xmx1g" "-server"]
   )

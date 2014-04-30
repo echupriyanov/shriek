@@ -14,8 +14,12 @@
    :headers {"Content-Type" "application/edn"}
    :body (pr-str data)})
 
+(defn process-signup [u p]
+  (response {:user u :status "Logged in!"}))
+
 (defroutes compojure-handler
   (GET "/" [] (slurp (io/resource "public/html/index.html")))
+  (POST "/signup" [user pass] (process-signup user pass))
   (GET "/req" request (str request))
   (route/resources "/")
   (route/files "/" {:root (config :external-resources)})
