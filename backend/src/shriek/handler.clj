@@ -1,8 +1,9 @@
 (ns shriek.handler
   (:require [compojure.core :refer [defroutes]]
-            [shriek.routes.home :refer [home-routes]]
+            [shriek.routes.home :refer [home-routes app-rroutes]]
             [shriek.middleware :as middleware]
             [noir.util.middleware :refer [app-handler]]
+            [noir.session :as session]
             [compojure.route :as route]
             [taoensso.timbre :as timbre]
             [taoensso.timbre.appenders.rotor :as rotor]
@@ -42,16 +43,21 @@
   (timbre/info "Shriek is shutting down..."))
 
 
+(defn user-access [req]
+  (if-let [user (session/get :user)]
+    (isa? (:role user) :db/user)
+    nil))
 
 (def app (app-handler
            ;; add your application routes here
-           [home-routes app-routes]
+           [home-routes app-rroutes app-routes]
            ;; add custom middleware here
            :middleware [middleware/template-error-page
                         middleware/log-request]
 ;;                        wrap-edn-params]
            ;; add access rules here
-           :access-rules []
+           :access-rules [{:redirect "/access-denied"
+                :rule user-access}]
            ;; serialize/deserialize the following data formats
            ;; available formats:
            ;; :json :json-kw :yaml :yaml-kw :edn :yaml-in-html

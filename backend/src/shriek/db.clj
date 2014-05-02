@@ -2,7 +2,21 @@
   (:require
     [datomic.api :as d]
     [clojure.edn :as edn]
-    [clojure.java.io :as io]))
+    [clojure.java.io :as io]
+    [noir.util.crypt :as c]))
+
+(derive :db/admin :db/user)
+
+(defn check-user
+  "Search user in DB and return map with user's data
+  For now just sets her password to her name"
+  [email pass]
+  (if (c/compare pass (c/encrypt email))
+    {:email email :role :db/user}
+    nil))
+
+(check-user "tchu@tchu.ru" "tchu@tchu.ru")
+
 
 ;;(require '[crypto.password.pbkdf2 :as password])
 
