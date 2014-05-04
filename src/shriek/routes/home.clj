@@ -48,7 +48,7 @@
   (POST "/board/add" [name title] (resp/edn (db/create-board {:name name :title title}))))
 
 (defroutes home-routes
-  (GET "/" [] (home-page))
+  (GET "/" [] (login-page))
   (context "/app" [] app-rroutes)
   (GET "/access-denied" [] (access-denied))
   (GET "/login" [] (login-page))

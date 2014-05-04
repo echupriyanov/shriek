@@ -4,9 +4,8 @@ pom.xml.asc
 *log
 /lib/
 /classes/
-/backend/target/
+/target/
 /checkouts/
-/frontend/resources/js
 .lein-deps-sum
 .lein-repl-history
 .lein-plugins/
