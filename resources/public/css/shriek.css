@@ -1,0 +1,34 @@
+.my-class {
+  background-color: #ff0000;
+  margin-top: 10px;
+}
+
+.board {
+  background-color: rgba(114, 189, 201, 0.58);
+  border-radius: 10px;
+  margin: 5px;
+}
+
+.board-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: white;
+  border-bottom: 1px solid black;
+}
+
+.board-desc {
+  height: 5em;
+}
+
+.stack {
+  border-radius: 10px;
+  background-color: #92E8BD;
+  margin: 5px;
+}
+
+.stack-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: black;
+  border-bottom: 1px solid black;
+}

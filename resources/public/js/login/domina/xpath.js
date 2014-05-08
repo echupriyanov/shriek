@@ -38,10 +38,10 @@ domina.xpath.select_nodes = (function select_nodes(expr,node){return domina.xpat
 }),(function (resolver,doc,node__$1,expr__$1){var result = doc.evaluate(expr__$1,node__$1,null,XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,null);var num_results = result.snapshotLength;var i = 0;var acc = null;while(true){
 if((i < num_results))
 {{
-var G__7481 = (i + 1);
-var G__7482 = cljs.core.cons.call(null,result.snapshotItem(i),acc);
-i = G__7481;
-acc = G__7482;
+var G__7751 = (i + 1);
+var G__7752 = cljs.core.cons.call(null,result.snapshotItem(i),acc);
+i = G__7751;
+acc = G__7752;
 continue;
 }
 } else
@@ -60,41 +60,41 @@ domina.xpath.xpath = (function() {
 var xpath = null;
 var xpath__1 = (function (expr){return xpath.call(null,domina.xpath.root_element.call(null),expr);
 });
-var xpath__2 = (function (base,expr){if(typeof domina.xpath.t7486 !== 'undefined')
+var xpath__2 = (function (base,expr){if(typeof domina.xpath.t7756 !== 'undefined')
 {} else
 {
 /**
 * @constructor
 */
-domina.xpath.t7486 = (function (expr,base,xpath,meta7487){
+domina.xpath.t7756 = (function (expr,base,xpath,meta7757){
 this.expr = expr;
 this.base = base;
 this.xpath = xpath;
-this.meta7487 = meta7487;
+this.meta7757 = meta7757;
 this.cljs$lang$protocol_mask$partition1$ = 0;
 this.cljs$lang$protocol_mask$partition0$ = 393216;
 })
-domina.xpath.t7486.cljs$lang$type = true;
-domina.xpath.t7486.cljs$lang$ctorStr = "domina.xpath/t7486";
-domina.xpath.t7486.cljs$lang$ctorPrWriter = (function (this__4010__auto__,writer__4011__auto__,opt__4012__auto__){return cljs.core._write.call(null,writer__4011__auto__,"domina.xpath/t7486");
+domina.xpath.t7756.cljs$lang$type = true;
+domina.xpath.t7756.cljs$lang$ctorStr = "domina.xpath/t7756";
+domina.xpath.t7756.cljs$lang$ctorPrWriter = (function (this__4010__auto__,writer__4011__auto__,opt__4012__auto__){return cljs.core._write.call(null,writer__4011__auto__,"domina.xpath/t7756");
 });
-domina.xpath.t7486.prototype.domina$DomContent$ = true;
-domina.xpath.t7486.prototype.domina$DomContent$nodes$arity$1 = (function (_){var self__ = this;
+domina.xpath.t7756.prototype.domina$DomContent$ = true;
+domina.xpath.t7756.prototype.domina$DomContent$nodes$arity$1 = (function (_){var self__ = this;
 var ___$1 = this;return cljs.core.mapcat.call(null,cljs.core.partial.call(null,domina.xpath.select_nodes,self__.expr),domina.nodes.call(null,self__.base));
 });
-domina.xpath.t7486.prototype.domina$DomContent$single_node$arity$1 = (function (_){var self__ = this;
+domina.xpath.t7756.prototype.domina$DomContent$single_node$arity$1 = (function (_){var self__ = this;
 var ___$1 = this;return cljs.core.first.call(null,cljs.core.filter.call(null,cljs.core.complement.call(null,cljs.core.nil_QMARK_),cljs.core.map.call(null,cljs.core.partial.call(null,domina.xpath.select_node,self__.expr),domina.nodes.call(null,self__.base))));
 });
-domina.xpath.t7486.prototype.cljs$core$IMeta$_meta$arity$1 = (function (_7488){var self__ = this;
-var _7488__$1 = this;return self__.meta7487;
+domina.xpath.t7756.prototype.cljs$core$IMeta$_meta$arity$1 = (function (_7758){var self__ = this;
+var _7758__$1 = this;return self__.meta7757;
 });
-domina.xpath.t7486.prototype.cljs$core$IWithMeta$_with_meta$arity$2 = (function (_7488,meta7487__$1){var self__ = this;
-var _7488__$1 = this;return (new domina.xpath.t7486(self__.expr,self__.base,self__.xpath,meta7487__$1));
+domina.xpath.t7756.prototype.cljs$core$IWithMeta$_with_meta$arity$2 = (function (_7758,meta7757__$1){var self__ = this;
+var _7758__$1 = this;return (new domina.xpath.t7756(self__.expr,self__.base,self__.xpath,meta7757__$1));
 });
-domina.xpath.__GT_t7486 = (function __GT_t7486(expr__$1,base__$1,xpath__$1,meta7487){return (new domina.xpath.t7486(expr__$1,base__$1,xpath__$1,meta7487));
+domina.xpath.__GT_t7756 = (function __GT_t7756(expr__$1,base__$1,xpath__$1,meta7757){return (new domina.xpath.t7756(expr__$1,base__$1,xpath__$1,meta7757));
 });
 }
-return (new domina.xpath.t7486(expr,base,xpath,null));
+return (new domina.xpath.t7756(expr,base,xpath,null));
 });
 xpath = function(base,expr){
 switch(arguments.length){

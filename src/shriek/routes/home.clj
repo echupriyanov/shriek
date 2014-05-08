@@ -40,8 +40,12 @@
 (defn app []
   (layout/render "app.html"))
 
+(defn scraps []
+  (layout/render "site.html"))
+
 (def-restricted-routes app-rroutes
   (GET "/" [] (app))
+  (POST "/bad" [] (resp/status 401 (resp/edn "You are nasty SOB!")))
   (GET "/board/list" [] (resp/edn (db/list-boards)))
   (GET "/board/:id/list" [id] (resp/edn (db/list-stacks id)))
   (GET "/stack/:id/list" [id] (resp/edn (db/list-cards id)))
@@ -50,6 +54,7 @@
 (defroutes home-routes
   (GET "/" [] (login-page))
   (context "/app" [] app-rroutes)
+  (GET "/sss" [] (scraps))
   (GET "/access-denied" [] (access-denied))
   (GET "/login" [] (login-page))
   (GET "/edn" [] (resp/edn {:foo 1 :bar 2}))

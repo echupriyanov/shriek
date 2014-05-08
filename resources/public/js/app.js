@@ -9,4 +9,4 @@ goog.addDependency("../domina.js", ['domina'], ['goog.dom.classes', 'cljs.core',
 goog.addDependency("../domina/xpath.js", ['domina.xpath'], ['cljs.core', 'goog.dom', 'domina']);
 goog.addDependency("../domina/css.js", ['domina.css'], ['cljs.core', 'goog.dom', 'domina', 'goog.dom.query']);
 goog.addDependency("../enfocus/core.js", ['enfocus.core'], ['goog.dom.classes', 'goog.Timer', 'cljs.core', 'enfocus.enlive.syntax', 'goog.dom.ViewportSizeMonitor', 'goog.async.Delay', 'goog.dom', 'domina.xpath', 'clojure.string', 'domina', 'goog.net.XhrIo', 'goog.style', 'goog.dom.query', 'domina.css', 'goog.dom.forms', 'goog.events']);
-goog.addDependency("../shriek/app.js", ['shriek.app'], ['cljs.core', 'ajax.core', 'enfocus.core']);
+goog.addDependency("../shriek/app.js", ['shriek.app'], ['cljs.core', 'ajax.core', 'enfocus.core', 'cljs.reader']);

@@ -12,7 +12,7 @@
     [clj-time.local :as tl]
    ))
 
-(defdb db (mysql { :db (str (config :db :name) "?useUnicode=true&characterEncoding=utf8")
+(defdb db (mysql { :db (str (config :db :name) "?useUnicode=true&characterEncoding=utf8&tcpKeepAlive=true&autoReconnect=true")
                    :host (config :db :host)
                    :user (config :db :user)
                    :password (config :db :pass)

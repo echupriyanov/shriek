@@ -4,6 +4,7 @@
             [shriek.middleware :as middleware]
             [noir.util.middleware :refer [app-handler]]
             [noir.session :as session]
+            [noir.response :as resp]
             [compojure.route :as route]
             [taoensso.timbre :as timbre]
             [taoensso.timbre.appenders.rotor :as rotor]
@@ -48,6 +49,14 @@
     (isa? (:role user) :db/user)
     nil))
 
+(re-matches #"^/app.*" "app/board/list")
+
+(defn access-denied [req]
+  (if (re-matches #"^/app/.*" (:uri req))
+    (resp/status 401 (str "Denied!"))
+    (resp/redirect "/login"))
+  )
+
 (def app (app-handler
            ;; add your application routes here
            [home-routes app-rroutes app-routes]
@@ -55,7 +64,7 @@
            :middleware [middleware/template-error-page
                         middleware/log-request]
            ;; add access rules here
-           :access-rules [{:redirect "/login"
+           :access-rules [{:on-fail access-denied
                            :rule user-access}]
            ;; serialize/deserialize the following data formats
            ;; available formats:
