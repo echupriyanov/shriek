@@ -111,21 +111,23 @@
                     :role :db/user
                     :state {:context :app/boards :param 0}})
   (delete boards)
-  (create-board {:name "Птицы" :title "Первая досочка"})
-  (create-board {:name "Животные" :title "Вторая досочка"})
-  (create-board {:name "Рыбы" :title "Третья досочка"})
+  (create-board {:name "Змеи" :description "Четвертая досочка"})
+  (create-board {:name "Животные" :description "Вторая досочка"})
+  (create-board {:name "Рыбы" :description "Третья досочка"})
 
   (delete stacks)
-  (add-stack-to-name "Птицы" {:name "Лесные" :title "Птицы, живущме в лесу"})
-  (add-stack-to-name "Птицы" {:name "Городские" :title "Птицы, живущме в городе"})
-  (add-stack-to-name "Птицы" {:name "Водоплавающие" :title "Птицы, которын умеют плавать"})
-  (add-stack-to-name "Животные" {:name "Хищники" :title "Кровожадныу звери"})
-  (add-stack-to-name "Животные" {:name "Травоядные" :title "Милые няшки"})
-  (add-stack-to-name "Рыбы" {:name "Морские" :title "Океанские рыбы"})
-  (add-stack-to-name "Рыбы" {:name "Речные" :title "Пресноводные рыбы"})
-  (add-stack-to-name "Рыбы" {:name "Озерные" :title "Вкусгяшки"})
+  (add-stack-to-name "Птицы" {:name "Лесные" :description "Птицы, живущме в лесу"})
+  (add-stack-to-name "Птицы" {:name "Городские" :description "Птицы, живущме в городе"})
+  (add-stack-to-name "Птицы" {:name "Водоплавающие" :description "Птицы, которын умеют плавать"})
+  (add-stack-to-name "Животные" {:name "Хищники" :description "Кровожадныу звери"})
+  (add-stack-to-name "Животные" {:name "Травоядные" :description "Милые няшки"})
+  (add-stack-to-name "Рыбы" {:name "Морские" :description "Океанские рыбы"})
+  (add-stack-to-name "Рыбы" {:name "Речные" :description "Пресноводные рыбы"})
+  (add-stack-to-name "Рыбы" {:name "Озерные" :description "Вкусгяшки"})
   )
 
+(comment
 (populate)
-
-
+(try (create-board {:name "Змеи" :description "Четвертая досочка"})
+  (catch Exception e (str "Caught exception "(.getMessage e))))
+  )

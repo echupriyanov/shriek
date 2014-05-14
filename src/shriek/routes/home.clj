@@ -49,7 +49,9 @@
   (GET "/board/list" [] (resp/edn (db/list-boards)))
   (GET "/board/:id/list" [id] (resp/edn (db/list-stacks id)))
   (GET "/stack/:id/list" [id] (resp/edn (db/list-cards id)))
-  (POST "/board/add" [name title] (resp/edn (db/create-board {:name name :title title}))))
+  (POST "/board/add" [name description] (resp/edn (db/create-board {:name name :description description})))
+  (GET "/user/info" [] (resp/edn (session/get :user)))
+  )
 
 (defroutes home-routes
   (GET "/" [] (login-page))

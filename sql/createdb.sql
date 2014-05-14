@@ -12,14 +12,14 @@ create table shriek.cards(
 create table shriek.stacks(
   id int auto_increment primary key,
   name varchar(255) unique,
-  title varchar(1024),
+  description varchar(1024),
   boards_id int
   );
 
 create table shriek.boards(
   id int auto_increment primary key,
   name varchar(255) unique,
-  title varchar(1024)
+  description varchar(1024)
   );
 
 create table shriek.users(

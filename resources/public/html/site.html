@@ -12,28 +12,69 @@
         <div class="container">
             <div class="blist-header">
                 <h1 class="blist-title">Панели</h1>
+                <a href="#" class="refresh" onclick="shriek.app.start()"><h1><i class="fa fa-refresh"></i></h1></a>
                 <p class="lead blist-desc">Список доступных панелей.</p>
             </div>
             <div class="row" id="board-list">
-                <div class="col-md-2 board" id="board"><p class="board-title" id="name">Sample board</p><p class="board-desc" id="title">Описание доски</p></div>
+                <div class="col-md-2 board" id="board"><p class="board-title" id="name">Sample board</p><p class="board-desc" id="description">Описание доски</p></div>
+                <div class="col-md-2 board" id="board-new" onclick="shriek.app.board_add()"><p class="board-title">Добавить панель</p></div>
             </div>
             <div class="slist-header">
                 <h1 class="slist-title">Панелька</h1>
-                <p class="lead slist-desc">Список доступных панелей.</p>
+                <a href="#" class="refresh"><h1><i class="fa fa-refresh"></i></h1></a>
+                <p class="lead slist-desc">Список доступных папок.</p>
             </div>
             <div class="row" id="stack-list">
                 <div class="col-md-2 stack" id="stack">
+                    <h5 class="stack-title" id="title">
+                        <a href="#"><i class="fa fa-pencil stack-edit-icon pull-right"></i></a>
+                        <div>Sample stack with long title</div>
+                    </h5>
+                    <div class="card" id="card"><p>Типо карточка</p>
+                    </div>
+                    <div class="card" id="card">
+                        <p>Типо карточка</p>
+                    </div>
+                    <div class="card" id="card">
+                        <p>Типо карточка</p>
+                    </div>
+                </div>
+                <div class="col-md-2 stack" id="stack">
                     <p class="stack-title" id="title">Sample stack</p>
-                    <div class="card" id="card"><p>Типо карточка</p></div>
+                    <ul class="list-group">
+                        <li class="list-group-item card">Карточка Карточка Карточка Карточка</li>
+                        <li class="list-group-item card">Карточка</li>
+                    </ul>
                 </div>
                 <div class="col-md-2 stack" id="stack">
                     <p class="stack-title" id="title">Sample stack</p>
                     <div class="card" id="card"><p>Типо карточка</p></div>
                 </div>
-                <div class="col-md-2 stack" id="stack">
-                    <p class="stack-title" id="title">Sample stack</p>
-                    <div class="card" id="card"><p>Типо карточка</p></div>
-                </div>
+            </div>
+            <hr />
+            <div class="row container board-add-form">
+                <div class="alert alert-danger" id="baf-error">Ошибка</div>
+                <h1 class="slist-title">Добавление панели</h1>
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="board-add-name" class="col-sm-2 control-label">Название панели</label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" id="board-add-name" placeholder="Введите название новой панеди с карточками">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="board-add-descricptiom" class="col-sm-2 control-label">Описание</label>
+                        <div class="col-sm-5">
+                            <textarea class="form-control" id="board-add-description" placeholder="Введите описание новой панели" rows=3></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-5">
+                            <button class="btn btn-primary" onclick="shriek.app.try_create_board()">Submit</button>
+                            <button class="btn btn-default" onclick="shriek.app.start()">Cancel</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
         <script src="//code.jquery.com/jquery.min.js"></script>

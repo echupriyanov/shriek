@@ -4,7 +4,7 @@
 }
 
 .board {
-  background-color: rgba(114, 189, 201, 0.58);
+  background-color: #95E7E8;
   border-radius: 10px;
   margin: 5px;
 }
@@ -20,6 +20,15 @@
   height: 5em;
 }
 
+.blist-title, .slist-title {
+  display: inline-block;
+}
+
+.refresh {
+  display: inline-block;
+  float: right;
+}
+
 .stack {
   border-radius: 10px;
   background-color: #92E8BD;
@@ -27,8 +36,50 @@
 }
 
 .stack-title {
-  font-size: 1.2em;
-  font-weight: bold;
+  display: inline-block;
   color: black;
+  padding-bottom: 3px;
   border-bottom: 1px solid black;
+}
+
+.stack-edit-icon {
+  display: inline-block;
+}
+
+.board:hover {
+  cursor: pointer;
+  background-color: #286F70;
+}
+
+#board-new:hover {
+  cursor: pointer;
+  background-color: #286F70;
+}
+
+#add-board-name {
+  margin-bottom: 1em;
+}
+
+.nav-stacks {
+  display: none;
+}
+
+.card {
+  background-color: white;
+  margin-bottom: 3px;
+}
+
+
+.card-edit-icon {
+  font-size: 0.7em;
+  float: left;
+}
+
+.card-modified {
+  font-size: 0.7em;
+  float: right;
+}
+
+#baf-error {
+  display: none;
 }

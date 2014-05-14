@@ -27,11 +27,13 @@
                     </div>
                     <div class="navbar-collapse collapse ">
                         <ul class="nav navbar-nav">
-                            <li class="{{home-selected}}"><a href="{{servlet-context}}/">Home</a></li>
-                            <li class="{{about-selected}}"><a href="{{servlet-context}}/about">About</a></li>
+                            <li class="{{home-selected}}"><a href="#" onclick="shriek.app.start()">Панели</a></li>
+                            <li class="nav-stacks"><a href="#">Папки</a></li>
+                            <li class="{{about-selected}}"><a href="#"><i class="fa fa-plus"></i></a></li>
                         </ul>
                         <ul class="nav navbar-nav navbar-right">
-                            <li><a class="btn btn-primary" onclick="shriek.app.try_process_logout()">Logout</a></li>
+                            <li><p class="navbar-text" id="username">Имя пользователя</p></li>
+                            <li><button type="button" class="btn navbar-btn btn-default btn-sm" onclick="shriek.app.try_process_logout()">Logout</button></li>
                         </ul>
                     </div>
                 </div>

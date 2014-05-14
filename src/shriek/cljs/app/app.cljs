@@ -4,6 +4,10 @@
             [ajax.core :refer [GET POST]])
   (:require-macros [enfocus.macros :as em]))
 
+(declare start)
+
+(def userinfo (atom {}))
+
 (defn ^:export logout-ok [r]
   (aset js/window.location "href" "/login")
   )
@@ -32,29 +36,59 @@
          :error-handler error-denied})
   )
 
-(em/defsnippet board-element "/html/site.html" "#board" [{:keys [name title] :as v}]
+(defn err-handler [resp]
+  (.log js/console (str ("Shit happend! reply: " (pr-str resp)))))
+
+(defn update-userinfo [resp]
+  (reset! userinfo resp)
+  (ef/at "#username" (ef/content (:fullname @userinfo))))
+
+
+(defn try-get-userinfo []
+  (GET "/app/user/info"
+       { :handler update-userinfo
+         :error-handler err-handler}))
+
+(em/defsnippet board-add-form "/html/site.html" ".board-add-form" [])
+
+(em/defsnippet board-element "/html/site.html" "#board" [{:keys [name description] :as v}]
                "#name" (ef/content name)
-               "#title" (ef/content title)
+               "#description" (ef/content description)
                "#board" (ef/set-attr :onclick
                                      (str "shriek.app.stack_view('" (pr-str v)"')")))
 
 (em/defsnippet blist-header "/html/site.html" ".blist-header" [])
 (em/defsnippet board-list "/html/site.html" "#board-list" [])
+(em/defsnippet board-new "html/site.html" "#board-new" [])
 
-(em/defsnippet slist-header "/html/site.html" ".slist-header" [{:keys [name title]}]
+(em/defsnippet slist-header "/html/site.html" ".slist-header" [{:keys [name description] :as b}]
                ".slist-title" (ef/content name)
-               ".slist-desc" (ef/content title))
+               "#refresh" (ef/set-attr :onclick (str "shriek.app.stack_view('" (pr-str b)"')"))
+               ".slist-desc" (ef/content description))
 
-(em/defsnippet stack-element "/html/site.html" "#stack" [{:keys [title id]}]
-               "#stack-title" (ef/content title))
+(em/defsnippet stack-element "/html/site.html" "#stack" [{:keys [name id]}]
+               "#stack-title" (ef/content name))
 
 (em/defsnippet stack-list "/html/site.html" "#stack-list" [])
 
-(defn err-handler [resp]
-  (.log js/console (str ("Shit happend! reply: " (pr-str resp)))))
+(defn ^:export board-add []
+  (ef/at "#main-content" (ef/content (board-add-form))))
+
+(defn board-created []
+  (start))
+
+(defn ^:export try-create-board []
+  (.log js/console (ef/from "#board-add-name" (ef/read-form-input)))
+  (.log js/console (ef/from "#board-add-description" (ef/read-form-input)))
+  (POST "/app/board/add"
+        {:params {:name (ef/from "#board-add-name" (ef/read-form-input))
+                  :description (ef/from "#board-add-description" (ef/read-form-input))}
+         :handler board-created
+         :error-handler err-handler}))
 
 (defn boards [data]
-  (ef/at "#board-list" (ef/content (map board-element data))
+  (ef/at "#board-list" (ef/do-> (ef/content (map board-element data))
+                       (ef/append (board-new)))
          ))
 
 (defn stacks [data]
@@ -77,7 +111,8 @@
 (defn ^:export board-view []
   (ef/at "#main-content"
          (ef/do-> (ef/content (blist-header))
-                  (ef/append (board-list)))
+                  (ef/append (board-list))
+                  )
          (try-board-list)))
 
 
@@ -87,7 +122,8 @@
                                     (ef/append (stack-list)))
            (try-stack-list (:id board)))))
 
-(defn start []
+(defn ^:export start []
+  (try-get-userinfo)
   (board-view))
 
 ;; (set! (.-onload js/window) start)
