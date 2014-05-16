@@ -1,7 +1,9 @@
 (ns shriek.repl
   (:use shriek.handler
         ring.server.standalone
-        [ring.middleware file-info file]))
+        [org.httpkit.server :only [run-server]]
+        [ring.middleware file-info file])
+  (:require [ring.middleware.reload :as reload]))
 
 (defonce server (atom nil))
 
@@ -12,6 +14,7 @@
   ;; changes, the server picks it up without having to restart.
   (-> #'app
       ; Makes static assets in $PROJECT_DIR/resources/public/ available.
+      (reload/wrap-reload)
       (wrap-file "resources")
       ; Content-Type, Content-Length, and Last Modified headers for files in body
       (wrap-file-info)))
@@ -20,16 +23,17 @@
   "used for starting the server in development mode from REPL"
   [& [port]]
   (let [port (if port (Integer/parseInt port) 3000)]
-    (reset! server
-            (serve (get-handler)
-                   {:port port
-                    :init init
-                    :auto-reload? true
-                    :destroy destroy
-                    :open-browser? false
-                    :join? false}))
+;;     (reset! server
+;;             (serve (get-handler)
+;;                    {:port port
+;;                     :init init
+;;                     :auto-reload? true
+;;                     :destroy destroy
+;;                     :open-browser? false
+;;                     :join? false}))
+     (reset! server (run-server (get-handler) {:port port}))
     (println (str "You can view the site at http://localhost:" port))))
 
 (defn stop-server []
-  (.stop @server)
+  (@server :timeout 100)
   (reset! server nil))

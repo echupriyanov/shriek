@@ -24,3 +24,7 @@
                :body (parser/render error-template data)}
               (throw ex))))))
     handler))
+
+;; (defn anti-fogery [handler]
+;;   (ring-anti-forgery/wrap-anti-forgery
+;;     {:read-token (fn [req] (-> req :params :csrf-token))}))
