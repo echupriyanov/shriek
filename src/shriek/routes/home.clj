@@ -71,7 +71,7 @@
 (defn scraps []
   (layout/render "site.html"))
 
-(defroutes app-rroutes
+(def-restricted-routes app-rroutes
   (GET "/" [] (app))
   (POST "/bad" [] (resp/status 401 (resp/edn "You are nasty SOB!")))
   (GET "/board/list" [] (resp/edn (db/list-boards)))

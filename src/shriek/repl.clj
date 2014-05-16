@@ -1,6 +1,6 @@
 (ns shriek.repl
+  (:gen-class)
   (:use shriek.handler
-        ring.server.standalone
         [org.httpkit.server :only [run-server]]
         [ring.middleware file-info file])
   (:require [ring.middleware.reload :as reload]))
@@ -22,21 +22,10 @@
 (defn start-server
   "used for starting the server in development mode from REPL"
   [& [port]]
-  (let [port (if port (Integer/parseInt port) 3000)]
-;;     (reset! server
-;;             (serve (get-handler)
-;;                    {:port port
-;;                     :init init
-;;                     :auto-reload? true
-;;                     :destroy destroy
-;;                     :open-browser? false
-;;                     :join? false}))
-     (reset! server (run-server (get-handler) {:port port}))
+  (let [port (or port 3000)]
+    (reset! server (run-server (get-handler) {:port port}))
     (println (str "You can view the site at http://localhost:" port))))
 
 (defn stop-server []
   (@server :timeout 100)
   (reset! server nil))
-
-(defn -main [& args]
-  (start-server))

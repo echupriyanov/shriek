@@ -1,7 +1,7 @@
 (ns shriek.handler
   (:gen-class)
   (:use         compojure.handler
-                ring.middleware.edn
+                [ring.middleware file-info file]
                 )
   (:require [compojure.core :refer [defroutes]]
             [shriek.routes.home :refer [home-routes app-rroutes ch-chsk]]
@@ -16,6 +16,7 @@
             [clojure.core.match :as match :refer (match)]
             [clojure.core.async :as async :refer (<! <!! >! >!! put! chan go go-loop)]
             [selmer.parser :as parser]
+            [ring.middleware.reload :as reload]
             [ring.middleware.edn :refer [wrap-edn-params]]
             [ring.middleware.anti-forgery :as ring-anti-forgery]
             [environ.core :refer [env]]))
@@ -62,39 +63,16 @@
     (resp/redirect "/login"))
   )
 
-;; (def app (app-handler
-;;           ;; add your application routes here
-;;           [home-routes app-rroutes app-routes]
-;;           ;; add custom middleware here
-;;           ;;           :middleware [middleware/template-error-page
-;;           ;;                        middleware/log-request
-;;           ;;                        ring-anti-forgery/wrap-anti-forgery
-;;           ;;                        ]
-;;           ;; add access rules here
-;;           :access-rules [{:on-fail access-denied
-;;                           :rule user-access}]
-;;           ;; serialize/deserialize the following data formats
-;;           ;; available formats:
-;;           ;; :json :json-kw :yaml :yaml-kw :edn :yaml-in-html
-;;           :formats [:edn]))
-
 (def app (app-handler
           [home-routes app-routes]
-                :middleware [wrap-edn-params
+          :middleware [
+                       wrap-edn-params
                        middleware/template-error-page
                        middleware/log-request
-                      ]
+                       ]
           :access-rules [{:on-fail access-denied
                           :rule user-access}]
           ))
-
-;; (def app
-;;   (-> home-routes
-;;       (wrap-access-rules [{:on-fail access-denied
-;;                            :rule user-access}])
-;;       session/wrap-noir-session
-;;       site
-;;       wrap-edn-params))
 
 (defn- logf [fmt & xs]
   (timbre/debug (apply format fmt xs)))
