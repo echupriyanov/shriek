@@ -30,7 +30,7 @@
                  [korma "0.3.1"]
                  [mysql/mysql-connector-java "5.1.30"]
                  ]
-  :main ^:skip-aot shriek.core
+  :main ^:skip-aot shriek.repl
   :repl-options {:init-ns shriek.repl}
   :target-path "target/%s"
   :plugins [[lein-ring "0.8.10"]

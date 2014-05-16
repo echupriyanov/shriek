@@ -1,4 +1,5 @@
 (ns shriek.handler
+  (:gen-class)
   (:use         compojure.handler
                 ring.middleware.edn
                 )

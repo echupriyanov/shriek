@@ -37,3 +37,6 @@
 (defn stop-server []
   (@server :timeout 100)
   (reset! server nil))
+
+(defn -main [& args]
+  (start-server))
