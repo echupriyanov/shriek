@@ -8,8 +8,8 @@
             [taoensso.timbre :as timbre]
             [noir.session :as session]
             [taoensso.sente :as sente]
+            [clojure.core.match :as match :refer [match]]
             [compojure.route :as route]
-            [chord.http-kit :refer [wrap-websocket-handler]]
             [clojure.core.async :as async :refer [<! >! put! close! go-loop]]
             [noir.response :as resp]))
 
@@ -25,16 +25,16 @@
 
 (defonce broadcaster
   (go-loop [i 0]
-    (<! (async/timeout 10000))
-    (println (format "Broadcasting server>client: %s" @connected-uids))
-    (doseq [uid (:any @connected-uids)]
-      (chsk-send! uid
-        [:some/broadcast
-         {:what-is-this "A broadcast pushed from server"
-          :how-often    "Every 10 seconds"
-          :to-whom uid
-          :i i}]))
-    (recur (inc i))))
+           (<! (async/timeout 10000))
+           (println (format "Broadcasting server>client: %s" @connected-uids))
+           (doseq [uid (:any @connected-uids)]
+             (chsk-send! uid
+                         [:some/broadcast
+                          {:what-is-this "A broadcast pushed from server"
+                           :how-often    "Every 10 seconds"
+                           :to-whom uid
+                           :i i}]))
+           (recur (inc i))))
 
 (defn home-page []
   (layout/render
@@ -56,7 +56,7 @@
     (do (session/put! :user data)
       (assoc-in (resp/edn {:user u :status "OK!"}) [:session :uid] (:email data))
       )
-    (resp/edn {:user u :status "Loggin failed!"})))
+    (resp/edn {:user u :status "Login failed!"})))
 
 (defn logout []
   (session/remove! :user)
@@ -68,9 +68,6 @@
 (defn app []
   (layout/render "app.html"))
 
-(defn scraps []
-  (layout/render "site.html"))
-
 (def-restricted-routes app-rroutes
   (GET "/" [] (app))
   (POST "/bad" [] (resp/status 401 (resp/edn "You are nasty SOB!")))
@@ -81,28 +78,44 @@
   (GET "/user/info" [] (resp/edn (session/get :user)))
   )
 
-(defn ws-handler [{:keys [ws-channel] :as req}]
-  (println "Opened connection from" (:remote-addr req))
-  (go-loop []
-           (when-let [{:keys [message error] :as msg} (<! ws-channel)]
-             (prn "Message received:" msg)
-             (>! ws-channel (if error
-                              (format "Error: '%s'." (pr-str msg))
-                              {:received (format "You passed: '%s' at %s." (pr-str message) (java.util.Date.))}))
-             (recur))))
+(def-restricted-routes ws-routes
+  (GET  "/chsk" req (ring-ajax-get-or-ws-handshake req))
+  (POST "/chsk" req (ring-ajax-post                req))
+  )
 
 (defroutes home-routes
   (GET "/" [] (login-page))
   (context "/app" [] app-rroutes)
-  (GET "/sss" [] (scraps))
   (GET "/access-denied" [] (access-denied))
   (GET "/login" [] (login-page))
   (GET "/edn" [] (resp/edn {:foo 1 :bar 2}))
   (POST "/login" [user pass] (login user pass))
   (GET "/logout" [] (logout))
   (GET "/about" [] (about-page))
-  (GET "/ws" [] (-> ws-handler
-                    (wrap-websocket-handler {:format :json-kw})))
-  (GET  "/chsk" req (ring-ajax-get-or-ws-handshake req))
-  (POST "/chsk" req (ring-ajax-post                req))
   )
+
+(defn- logf [fmt & xs]
+  (timbre/debug (apply format fmt xs)))
+
+(defn- snt-send-user-info [])
+
+(defn event-msg-handler
+  [{:as ev-msg :keys [ring-req event ?reply-fn]} _]
+  (let [session (:session ring-req)
+        uid     (:uid session)
+        noir-session (:noir session)
+        [id data :as ev] event]
+
+    (logf "Event: %s" ev)
+    (match [id data]
+           [:shriek/user :getinfo] (do (logf "Got request for userinfo. Sending %s" (pr-str (:user noir-session)))
+                                     (?reply-fn (:user noir-session))
+                                     )
+           [:shriek/board :list] (?reply-fn (db/list-boards))
+           [:shriek/board [:list board_id]] (?reply-fn (db/list-stacks board_id))
+           ;; TODO: Match your events here, reply when appropriate <...>
+           :else
+           (do (logf "Unmatched event: %s" ev)
+             (when-not (:dummy-reply-fn? (meta ?reply-fn))
+               (?reply-fn {:umatched-event-as-echoed-from-from-server ev}))))))
+

@@ -4,7 +4,7 @@
                 [ring.middleware file-info file]
                 )
   (:require [compojure.core :refer [defroutes]]
-            [shriek.routes.home :refer [home-routes app-rroutes ch-chsk]]
+            [shriek.routes.home :refer [home-routes app-rroutes ws-routes ch-chsk event-msg-handler]]
             [shriek.middleware :as middleware]
             [noir.util.middleware :refer [app-handler wrap-access-rules]]
             [noir.session :as session]
@@ -13,8 +13,6 @@
             [taoensso.timbre :as timbre]
             [taoensso.sente :as sente]
             [taoensso.timbre.appenders.rotor :as rotor]
-            [clojure.core.match :as match :refer (match)]
-            [clojure.core.async :as async :refer (<! <!! >! >!! put! chan go go-loop)]
             [selmer.parser :as parser]
             [ring.middleware.reload :as reload]
             [ring.middleware.edn :refer [wrap-edn-params]]
@@ -64,32 +62,15 @@
   )
 
 (def app (app-handler
-          [home-routes app-routes]
+          [home-routes ws-routes app-routes]
           :middleware [
                        wrap-edn-params
                        middleware/template-error-page
-                       middleware/log-request
+;;                       middleware/log-request
                        ]
           :access-rules [{:on-fail access-denied
                           :rule user-access}]
           ))
-
-(defn- logf [fmt & xs]
-  (timbre/debug (apply format fmt xs)))
-
-(defn- event-msg-handler
-  [{:as ev-msg :keys [ring-req event ?reply-fn]} _]
-  (let [session (:session ring-req)
-        uid     (:uid session)
-        [id data :as ev] event]
-
-    (logf "Event: %s" ev)
-    (match [id data]
-           ;; TODO: Match your events here, reply when appropriate <...>
-           :else
-           (do (logf "Unmatched event: %s" ev)
-             (when-not (:dummy-reply-fn? (meta ?reply-fn))
-               (?reply-fn {:umatched-event-as-echoed-from-from-server ev}))))))
 
 (defonce chsk-router
   (sente/start-chsk-router-loop! event-msg-handler ch-chsk))

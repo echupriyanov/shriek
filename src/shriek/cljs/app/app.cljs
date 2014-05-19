@@ -1,6 +1,7 @@
 (ns shriek.app
   (:require [enfocus.core :as ef]
             [cljs.reader :as reader]
+            [cljs.core :refer [pr-str str]]
             [ajax.core :refer [GET POST]]
             [cljs.core.match] ; Optional, useful
             [cljs.core.async :as async :refer (<! >! put! chan)]
@@ -68,7 +69,8 @@
   )
 
 (defn err-handler [resp]
-  (.log js/console (str ("Shit happend! reply: " (pr-str resp)))))
+ (.log js/console (str "Shit happend! reply: " (pr-str resp))))
+
 
 (defn update-userinfo [resp]
   (reset! userinfo resp)
@@ -98,7 +100,7 @@
                ".slist-desc" (ef/content description))
 
 (em/defsnippet stack-element "/html/site.html" "#stack" [{:keys [name id]}]
-               "#stack-title" (ef/content name))
+               "#title" (ef/content name))
 
 (em/defsnippet stack-list "/html/site.html" "#stack-list" [])
 
@@ -123,6 +125,7 @@
          ))
 
 (defn stacks [data]
+  (logf "Adding stacks %s" (pr-str data))
   (ef/at "#stack-list" (ef/content (map stack-element data))))
 
 (defn try-board-list []
@@ -139,55 +142,58 @@
         :error-handler err-handler})
   )
 
-(defn ^:export board-view []
-  (ef/at "#main-content"
-         (ef/do-> (ef/content (blist-header))
-                  (ef/append (board-list))
-                  )
-         (try-board-list)))
+(defn snt-stack-list [repl]
+  (if (sente/cb-success? repl)
+    (stacks repl)
+    (err-handler repl))
+  )
 
+(defn snt-get-stack-list [id]
+  (chsk-send! [:shriek/board [:list id]] 5000 snt-stack-list))
 
 (defn ^:export stack-view [board-edn]
   (let [board (reader/read-string board-edn)]
     (ef/at "#main-content" (ef/do-> (ef/content (slist-header board))
-                                    (ef/append (stack-list)))
-           (try-stack-list (:id board)))))
+                                    (ef/append (stack-list))))
+           (snt-get-stack-list (:id board))))
 
-(defn receive-msgs [server-ch]
-  ;; every time we get a message from the server, add it to our list
-  (go-loop []
-           (when-let [msg (<! server-ch)]
-             (logf "Received msg: %s" (pr-str msg))
-             (recur))))
+(defn snt-user-info [repl]
+  (if (sente/cb-success? repl)
+    (update-userinfo repl)
+    (err-handler repl))
+  )
 
-(defn send-hi [server-ch]
-  (go
-   (>! server-ch {:text "hi"})))
+(defn snt-board-list [repl]
+  (if (sente/cb-success? repl)
+    (boards repl)
+    (err-handler repl))
+  )
 
-(defn ws-test [url]
-  (go
-   (let [{:keys [ws-channel error]} (<! (ws-ch url
-                                               {:format :json-kw}))]
-     (if error (logf "Error: %s" (pr-str error))
-       (do
-         (receive-msgs ws-channel)
-         (send-hi ws-channel)))
-     )))
+(defn snt-get-user-info []
+  (chsk-send! [:shriek/user :getinfo] 5000 snt-user-info))
 
-(defn ws-url []
-  (let [proto (aget js/window.location "protocol")
-        port (aget js/window.location "port")
-        host (aget js/window.location "hostname")
-        wsproto (if (= proto "https:") "wss://" "ws://")
-        wsurl (str wsproto host ":" port "/ws")]
-    (logf "WS URL: %s" wsurl)
-    wsurl
-    ))
+(defn snt-get-board-list []
+  (chsk-send! [:shriek/board :list] 5000 snt-board-list))
+
+(defn ^:export board-view []
+  (ef/at "#main-content"
+         (ef/do-> (ef/content (blist-header))
+                  (ef/append (board-list))
+                  ))
+  (snt-get-board-list)
+  )
 
 (defn ^:export start []
-;;  (ws-test (ws-url))
-  (try-get-userinfo)
-  (board-view))
+  (err-handler {:user 23434})
+  (snt-get-user-info)
+  ;;  (try-get-userinfo)
+  (board-view)
+  )
 
 ;; (set! (.-onload js/window) start)
 (set! (.-onload js/window) #(em/wait-for-load (start)))
+(comment
+  (sente/chsk-reconnect! chsk)
+  (cljs.core/pr-str 123)
+  (err-handler "343")
+  )
