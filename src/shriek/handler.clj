@@ -66,7 +66,7 @@
           :middleware [
                        wrap-edn-params
                        middleware/template-error-page
-;;                       middleware/log-request
+;;                        middleware/log-request
                        ]
           :access-rules [{:on-fail access-denied
                           :rule user-access}]

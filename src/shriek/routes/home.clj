@@ -23,18 +23,18 @@
   (def connected-uids                connected-uids) ; Watchable, read-only atom
   )
 
-(defonce broadcaster
-  (go-loop [i 0]
-           (<! (async/timeout 10000))
-           (println (format "Broadcasting server>client: %s" @connected-uids))
-           (doseq [uid (:any @connected-uids)]
-             (chsk-send! uid
-                         [:some/broadcast
-                          {:what-is-this "A broadcast pushed from server"
-                           :how-often    "Every 10 seconds"
-                           :to-whom uid
-                           :i i}]))
-           (recur (inc i))))
+;; (defonce broadcaster
+;;   (go-loop [i 0]
+;;            (<! (async/timeout 10000))
+;;            (println (format "Broadcasting server>client: %s" @connected-uids))
+;;            (doseq [uid (:any @connected-uids)]
+;;              (chsk-send! uid
+;;                          [:some/broadcast
+;;                           {:what-is-this "A broadcast pushed from server"
+;;                            :how-often    "Every 10 seconds"
+;;                            :to-whom uid
+;;                            :i i}]))
+;;            (recur (inc i))))
 
 (defn home-page []
   (layout/render
@@ -46,15 +46,13 @@
 (defn login-page []
   (layout/render "login.html"))
 
-;; (defn response [data & [status]]
-;;   {:status (or status 200)
-;;    :headers {"Content-Type" "application/edn"}
-;;    :body (pr-str data)})
+(defn genuuid []
+  (str (java.util.UUID/randomUUID)))
 
 (defn login [u p]
   (if-let [data (db/check-user u p)]
     (do (session/put! :user data)
-      (assoc-in (resp/edn {:user u :status "OK!"}) [:session :uid] (:email data))
+      (assoc-in (resp/edn {:user u :status "OK!"}) [:session :uid] (genuuid))
       )
     (resp/edn {:user u :status "Login failed!"})))
 
@@ -97,7 +95,14 @@
 (defn- logf [fmt & xs]
   (timbre/debug (apply format fmt xs)))
 
-(defn- snt-send-user-info [])
+(defn- snt-send-boards-list [uuid]
+  (chsk-send! uuid [:shriek/boards (db/list-boards)]))
+
+(defn- snt-send-stacks-list [uuid board_id]
+  (chsk-send! uuid [:shriek/stacks (db/list-stacks board_id)]))
+
+(defn- snt-send-boards-data [uuid board_id]
+  (chsk-send! uuid [:shriek/boards-data {:id board_id :data (db/board-data board_id)}]))
 
 (defn event-msg-handler
   [{:as ev-msg :keys [ring-req event ?reply-fn]} _]
@@ -111,8 +116,11 @@
            [:shriek/user :getinfo] (do (logf "Got request for userinfo. Sending %s" (pr-str (:user noir-session)))
                                      (?reply-fn (:user noir-session))
                                      )
-           [:shriek/board :list] (?reply-fn (db/list-boards))
-           [:shriek/board [:list board_id]] (?reply-fn (db/list-stacks board_id))
+           [:shriek/users :getinfo] (chsk-send! uid [:shriek/userinfo (:user noir-session)])
+           [:shriek/boards :list] (snt-send-boards-list uid)
+           [:shriek/boards [:getdata board_id]] (snt-send-boards-data uid board_id)
+           [:shriek/stacks [:list board_id]] (snt-send-stacks-list uid board_id)
+;;           [:shriek/boards [:add board]] (resp/edn (db/create-board {:name name :description description}))
            ;; TODO: Match your events here, reply when appropriate <...>
            :else
            (do (logf "Unmatched event: %s" ev)

@@ -10,6 +10,10 @@
     </head>
     <body>
         <div class="container">
+            <div class="alert alert-danger" id="sh-errors"><p>Ошибка</p><p>Ошибка #2</p></div>
+            <div class="alert alert-success" id="sh-success"><p>Успех</p><p>В багдаде всё спокойно #2</p></div>
+            <div class="alert alert-warning" id="sh-warning"><p>Предупреждение</p><p>Осторжно! Сегодня полнолуние! #2</p></div>
+            <div class="alert alert-info" id="sh-info"><p>Информация</p><p>Что-то с чем-то #2</p></div>
             <div class="blist-header">
                 <h1 class="blist-title">Панели</h1>
                 <a href="#" class="refresh" onclick="shriek.app.start()"><h1><i class="fa fa-refresh"></i></h1></a>
@@ -30,13 +34,8 @@
                         <a href="#"><i class="fa fa-pencil stack-edit-icon pull-right"></i></a>
                         <div id="title">Sample</div>
                     </h5>
-                    <div class="card" id="card"><p>Типо карточка</p>
-                    </div>
-                    <div class="card" id="card">
-                        <p>Типо карточка</p>
-                    </div>
-                    <div class="card" id="card">
-                        <p>Типо карточка</p>
+                    <div id="cards">
+                        <div class="card" id="card"><p>Типо карточка</p></div>
                     </div>
                 </div>
                 <div class="col-md-2 stack" id="stack">
@@ -53,7 +52,6 @@
             </div>
             <hr />
             <div class="row container board-add-form">
-                <div class="alert alert-danger" id="baf-error">Ошибка</div>
                 <h1 class="slist-title">Добавление панели</h1>
                 <form class="form-horizontal" role="form">
                     <div class="form-group">

@@ -8,7 +8,7 @@
                  [compojure "1.1.6"]
                  [ring/ring-devel "1.1.6"]
                  [http-kit "2.1.11"]
-                 [com.taoensso/sente "0.13.0"]
+                 [com.taoensso/sente "0.14.1"]
                  [lib-noir "0.8.2"]
                  [markdown-clj "0.9.43"]
                  [com.taoensso/timbre "3.1.6"]

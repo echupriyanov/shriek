@@ -12,7 +12,7 @@
         <link href="/css/screen.css" rel="stylesheet" type="text/css">
         <link href="/css/font-awesome.css" rel="stylesheet">
         <link type="text/css" rel="stylesheet" href="/css/shriek.css">
-        <script src="//code.jquery.com/jquery-2.0.3.min.js" type="text/javascript"></script>
+        <script src="/js/jquery-2.1.1.min.js" type="text/javascript"></script>
         <script src="/js/bootstrap.min.js" type="text/javascript">
             <script type="text/javascript">
                 var context = "{{servlet-context}}";
@@ -42,6 +42,12 @@
         <script src="js/app/goog/base.js" type="text/javascript"></script>
         <script type="text/javascript" src="/js/app.js" charset="utf-8"></script>
         <script type="text/javascript">goog.require("shriek.app");</script>
+        <div class="container" id="messages">
+            <div class="alert alert-danger" id="sh-errors"><p>Ошибка</p><p>Ошибка #2</p></div>
+            <div class="alert alert-success" id="sh-success"><p>Успех</p><p>В багдаде всё спокойно #2</p></div>
+            <div class="alert alert-warning" id="sh-warning"><p>Предупреждение</p><p>Осторжно! Сегодня полнолуние! #2</p></div>
+            <div class="alert alert-info" id="sh-info"><p>Информация</p><p>Что-то с чем-то #2</p></div>
+        </div>
         <div class="container" id="main-content">
             <a class="btn btn-primary" onclick="shriek.app.try_denied()">Bad</a>
         </div>

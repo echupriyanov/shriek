@@ -81,6 +81,18 @@
   float: right;
 }
 
-#baf-error {
+#sh-errors {
+  display: none;
+}
+
+#sh-success {
+  display: none;
+}
+
+#sh-info {
+  display: none;
+}
+
+#sh-warning {
   display: none;
 }
