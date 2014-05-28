@@ -14,6 +14,15 @@
                    [cljs.core.async.macros :as asyncm :refer (go go-loop)]
                    ))
 
+(let [{:keys [chsk ch-recv send-fn state] :as ws}
+      (sente/make-channel-socket! "/chsk" ; Note the same URL as before
+                                  {:type :ws})]
+  (def chsk       chsk)
+  (def ch-chsk    ch-recv) ; ChannelSocket's receive channel
+  (def chsk-send! send-fn) ; ChannelSocket's send API fn
+  (def chsk-state state) ; Watchable, read-only atom
+  )
+
 (def userinfo (atom {}))
 (def state (atom {:pos :top}))
 (def boardmap (atom {}))
@@ -31,6 +40,11 @@
   (ef/at "#sh-errors" (ef/do-> (ef/content (ef/html (map (fn [x] [:p x]) @errors)))
                                (ef/set-attr :style "display: block;"))))
 
+(defn flush-error []
+  (reset! errors [])
+  (ef/at "#sh-errors" (ef/do-> (ef/content (ef/html [:p "No errors."]))
+                               (ef/set-attr :style "display: none;"))))
+
 (defn log-error
   [e]
   (swap! errors #(conj % (pr-str e)))
@@ -47,12 +61,15 @@
          [:shriek/stacks m] (do (reset! stackmap m)
                               (refresh-page)
                               (logf "New stacks: %s" @stackmap))
+         [:shriek/boards-add m] (do (swap! boardmap (fn [x y] (conj x y)) {{:id m} m})
+                                  (refresh-page)
+                                  (logf "Received board update: %s" m))
          :else (logf "Unknown data from server: %s" (pr-str payload))
          ))
 
 (defn- event-handler [[id data :as ev] _]
   (logf "Event: %s" ev)
-  (log-error ev)
+;;  (log-error ev)
   (match [id data]
          ;; TODO Match your events here <...>
          [:chsk/state {:first-open? true}] (do
@@ -63,19 +80,8 @@
                                    (process-event payload))
          :else (logf "Unmatched event: %s" ev)))
 
-(defn- init []
-  (logf "Init called!")
-  (let [{:keys [chsk ch-recv send-fn state]}
-        (sente/make-channel-socket! "/chsk" ; Note the same URL as before
-                                    {:type :ws})]
-    (def chsk       chsk)
-    (def ch-chsk    ch-recv) ; ChannelSocket's receive channel
-    (def chsk-send! send-fn) ; ChannelSocket's send API fn
-    (def chsk-state state) ; Watchable, read-only atom
-    )
-  (defonce chsk-router
-    (sente/start-chsk-router-loop! event-handler ch-chsk))
-  (reset! initialized? true))
+(defonce chsk-router
+  (sente/start-chsk-router-loop! event-handler ch-chsk))
 
 (defn ^:export logout-ok [r]
   (aset js/window.location "href" "/login")
@@ -93,18 +99,6 @@
          :error-handler logout-not-ok}
        ))
 
-(defn ^:export error-denied [resp]
-  (.log js/console (str "Got respnose "(pr-str resp)))
-  (when (= (:status resp) 401)
-    (aset js/window.location "href" "/login")))
-
-(defn ^:export try-denied []
-  (POST "/app/bad"
-        {:params {}
-         :handler error-denied
-         :error-handler error-denied})
-  )
-
 (defn err-handler [resp]
   (.log js/console (str "Shit happend! reply: " (pr-str resp))))
 
@@ -113,14 +107,10 @@
   (reset! userinfo resp)
   (ef/at "#username" (ef/content (:fullname @userinfo))))
 
-
-(defn try-get-userinfo []
-  (GET "/app/user/info"
-       { :handler update-userinfo
-         :error-handler err-handler}))
-
-(em/defsnippet card-element "/html/site.html" "#card" [{:keys [title]}]
-               "#card" (ef/content (ef/html [:p title])))
+(em/defsnippet card-element "/html/site.html" "#card" [{:keys [title] :as v}]
+               "#card" (ef/content title)
+               "#card" (ef/set-attr :onclick
+                                    (str "shriek.app.card_view('" (pr-str v)"')")))
 
 (em/defsnippet board-add-form "/html/site.html" ".board-add-form" [])
 
@@ -145,20 +135,23 @@
 
 (em/defsnippet stack-list "/html/site.html" "#stack-list" [])
 
+(em/defsnippet article-view "html/site.html" ".article-view" [{:keys [id title html]}]
+               "#article-title" (ef/content title)
+               "#article-body" (ef/content html))
+
+(defn ^:export card-view [v]
+  (let [card (reader/read-string v)]
+    (logf "Trying to render %s" card)
+    (ef/at "#main-content" (ef/content (article-view card)))))
+
+;;(get (:cards (get (:data @boarddata) 145)) 86)
+
+(defn- board-exists? [name]
+  (some #(= name (:name %)) (vals @boardmap))
+  )
+
 (defn ^:export board-add []
   (ef/at "#main-content" (ef/content (board-add-form))))
-
-(defn board-created []
-  (start))
-
-(defn ^:export try-create-board []
-  (.log js/console (ef/from "#board-add-name" (ef/read-form-input)))
-  (.log js/console (ef/from "#board-add-description" (ef/read-form-input)))
-  (POST "/app/board/add"
-        {:params {:name (ef/from "#board-add-name" (ef/read-form-input))
-                  :description (ef/from "#board-add-description" (ef/read-form-input))}
-         :handler board-created
-         :error-handler err-handler}))
 
 (defn boards [data]
   (ef/at "#board-list" (ef/do-> (ef/content (map board-element data))
@@ -193,9 +186,24 @@
   (snt-get-board-list)
   )
 
+(defn board-created []
+  (board-view))
+
+(defn create-board-reply [r]
+  (logf "Got reply to create board: %s " r)
+  )
+
+(defn ^:export try-create-board []
+  (logf "Name of board: %s" (ef/from "#board-add-name" (ef/read-form-input)))
+  (logf "Board description: %s"(ef/from "#board-add-description" (ef/read-form-input)))
+  (POST "/app/board/add"
+        {:params {:name (ef/from "#board-add-name" (ef/read-form-input))
+                  :description (ef/from "#board-add-description" (ef/read-form-input))}
+         :handler board-created
+         :error-handler err-handler}
+        ))
+
 (defn refresh-page []
-  (if-not @initialized? (init))
-  (ef/at "#main-content" (ef/content "Hi!"))
   (match [@state]
          [{:pos :top}] (do (logf "trying to render %s " (pr-str (vals @boardmap)))(boards (vals @boardmap)))
          [{:pos :board :id board_id}] (stacks (vals (:data @boarddata)))
@@ -208,5 +216,7 @@
   (board-view)
   )
 
+;; (chsk-send! [:shriek/boards [:add {:name "669" :description "asfksdfjsh"}]] 10000 create-board-reply)
+
 ;; (set! (.-onload js/window) start)
-(set! (.-onload js/window) #(em/wait-for-load (refresh-page)))
+;;(set! (.-onload js/window) #(em/wait-for-load (init)))

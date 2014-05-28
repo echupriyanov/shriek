@@ -10,6 +10,7 @@
    [clj-time.core :as t]
    [clj-time.format :as tf]
    [clj-time.local :as tl]
+   [markdown.core :as md]
    ))
 
 (defdb db (mysql { :db (str (config :db :name) "?useUnicode=true&characterEncoding=utf8&tcpKeepAlive=true&autoReconnect=true")
@@ -31,7 +32,11 @@
                ))
   )
 
-(defentity cards)
+(defentity cards
+  (prepare (fn [v] (dissoc v :html)))
+  (transform (fn [v] (assoc v :html (md/md-to-html-string (:body v)))))
+  )
+
 (defentity stacks
   (has-many cards)
   )
@@ -62,6 +67,9 @@
 
 (defn delete-board [id]
   (delete boards (where {:id id})))
+
+(defn get-board [name]
+  (first (select boards (where {:name name}))))
 
 (defn list-boards []
   (list2map (select boards)))
@@ -113,8 +121,6 @@
     nil)
   )
 
-(check-user "a@a" "b")
-
 (defn populate
   "Populate db woth some demo users"
   []
@@ -148,7 +154,7 @@
   (let [user1 (:id (get-user "tchu@tchu.ru"))
         user2 (:id (get-user "demo@demo.org"))
         ]
-    (add-card-to-name "Лесные" {:title "Дятел" :users_id user1})
+    (add-card-to-name "Лесные" {:title "Дятел" :users_id user1 :body "#Кисо куку!"})
     (add-card-to-name "Лесные" {:title "Глухарь" :users_id user2})
     (add-card-to-name "Лесные" {:title "Тетерев" :users_id user1})
     (add-card-to-name "Городские" {:title "Ворона" :users_id user1})
@@ -174,11 +180,18 @@
 
   (def crds1 (reduce (fn [a x] (assoc a (:id x) x)) {} crds))
 
+  (populate)
+
   (vals crds1)
 
   (list-boards)
   (list-stacks 59)
   (first (board-data 62))
-  (list-cards 121)
+  (list-cards 145)
 
+  (md/md-to-html-string "#Киса куку!")
+
+  (try (create-board {:name "112" :description "test2"})
+    (catch Exception e {:status :shriek/failure :message (.getMessage e)})
   )
+)

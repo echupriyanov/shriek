@@ -70,6 +70,7 @@
                        ]
           :access-rules [{:on-fail access-denied
                           :rule user-access}]
+          :format []
           ))
 
 (defonce chsk-router

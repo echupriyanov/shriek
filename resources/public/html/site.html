@@ -34,20 +34,21 @@
                         <a href="#"><i class="fa fa-pencil stack-edit-icon pull-right"></i></a>
                         <div id="title">Sample</div>
                     </h5>
-                    <div id="cards">
-                        <div class="card" id="card"><p>Типо карточка</p></div>
-                    </div>
-                </div>
-                <div class="col-md-2 stack" id="stack">
-                    <p class="stack-title" id="title">Sample stack</p>
-                    <ul class="list-group">
-                        <li class="list-group-item card">Карточка Карточка Карточка Карточка</li>
-                        <li class="list-group-item card">Карточка</li>
+                    <ul class="list-group" id="cards">
+                        <li class="list-group-item card" id="card">Типо карточка</li>
                     </ul>
                 </div>
                 <div class="col-md-2 stack" id="stack">
                     <p class="stack-title" id="title">Sample stack</p>
-                    <div class="card" id="card"><p>Типо карточка</p></div>
+                    <ul class="list-group">
+                        <li class="list-group-item li-card">Карточка Карточка Карточка Карточка</li>
+                        <li class="list-group-item card">Карточка</li>
+                    </ul>
+                </div>
+                <div class="col-md-2 stack" id="stack-new" onclick="shriek.app.stack_form()">
+                    <h5 class="stack-title">
+                        <div id="title">Новая папка</div>
+                    </h5>
                 </div>
             </div>
             <hr />
@@ -57,7 +58,7 @@
                     <div class="form-group">
                         <label for="board-add-name" class="col-sm-2 control-label">Название панели</label>
                         <div class="col-sm-5">
-                            <input type="text" class="form-control" id="board-add-name" placeholder="Введите название новой панеди с карточками">
+                            <input type="text" class="form-control" id="board-add-name" autofocus placeholder="Введите название новой панели">
                         </div>
                     </div>
                     <div class="form-group">
@@ -68,13 +69,123 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-5">
-                            <button class="btn btn-primary" onclick="shriek.app.try_create_board()">Submit</button>
-                            <button class="btn btn-default" onclick="shriek.app.start()">Cancel</button>
+                            <button class="btn btn-primary" type="button" onclick="shriek.app.try_create_board()">Создать</button>
+                            <button class="btn btn-default" type="button" onclick="shriek.app.start()">Отмена</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row container stack-add-form">
+                <h1 class="slist-title">Добавление папки</h1>
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="stack-add-name" class="col-sm-2 control-label">Название папки</label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" id="stack-add-name" autofocus placeholder="Введите название новой папки с карточками">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="stack-add-descricptiom" class="col-sm-2 control-label">Описание</label>
+                        <div class="col-sm-5">
+                            <textarea class="form-control" id="stack-add-description" placeholder="Введите описание новой папки" rows=3></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-5">
+                            <button class="btn btn-primary" type="button" onclick="shriek.app.try_create_stack()">Создать</button>
+                            <button class="btn btn-default" type="button" onclick="shriek.app.board_view()">Отмена</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row container article-view">
+                <h1 id="article-title">Название карточки</h1>
+                <div id="article-body">А тут содержимое карточки
+                </div>
+                <hr />
+                <div class="col-sm-offset-2 col-sm-5">
+                    <button class="btn btn-default" type="button" onclick="shriek.app.board_view">Назад</button>
+                    <button class="btn btn-primary" type="button" onclick="shriek.app.article_edit_form()">Редактировать</button>
+                    <button class="btn btn-danger" type="button" onclick="shriek.app.try_article_delete()">Удалить</button>
+                </div>
+            </div>
+            <div class="row container login-form" id="login-form">
+                <h1 class="slist-title">Вход в систему</h1>
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="login-email" class="col-sm-2 control-label">Постовый адрес</label>
+                        <div class="col-sm-5">
+                            <input type="email" class="form-control" id="login-email" placeholder="email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password" class="col-sm-2 control-label">Пароль</label>
+                        <div class="col-sm-5">
+                            <input type="password" class="form-control" id="login-password" placeholder="password">
+                            <input type="password" class="form-control" style="border:0;width:10px;height:10px;" id="fakePassword" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-btn" class="col-sm-offset-2 col-sm-1">или</label>
+                        <button type="button" class="btn btn-info btn-xs" onclick="shriek.app.register()">зарегистрируйтесь</button>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-5">
+                            <button type="button" class="btn btn-primary" onclick="shriek.app.try_login()">Login</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="row container form-register" id="form-register">
+                <h1 class="slist-title">Регистрация</h1>
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="reg-name" class="col-sm-2 control-label">Имя</label>
+                        <div class="col-sm-5">
+                            <input type="email" class="form-control" id="reg-name" placeholder="name">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email" class="col-sm-2 control-label">Постовый адрес</label>
+                        <div class="col-sm-5">
+                            <input type="email" class="form-control" id="reg-email" placeholder="email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password1" class="col-sm-2 control-label">Пароль</label>
+                        <div class="col-sm-5">
+                            <input type="password" class="form-control" id="reg-password1" placeholder="password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password2" class="col-sm-2 control-label">Пароль еще раз</label>
+                        <div class="col-sm-5">
+                            <input type="password" class="form-control" id="reg-password2" placeholder="password">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-5">
+                            <button type="button" class="btn btn-primary" onclick="shriek.login.try_register()">Register</button>
+                            <button type="button" class="btn btn-default" onclick="shriek.login.start()">Cancel</button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
+        <div class="container">
+            <div class="form-signin" autocomplete="off">
+                <h2 class="form-signin-heading">Пожалуйста, войдите:</h2>
+                <input type="email" class="form-control" id="email" placeholder="email" required autofocus autocomplete="off">
+                <input type="password" class="form-control" id="password" placeholder="password" required autocomplete="off">
+                <input type="password" class="form-control" id="fakePassword" style="border:0;width:1px;height:10px;" disabled />
+                <label class="register">
+                    или <button type="button" class="btn btn-info btn-xs" onclick="shriek.login.register()">зарегистрируйтесь</button>
+                </label>
+                <input type="password" class="form-control" id="fakePassword" style="border:0;width:1px;height:10px;" disabled />
+                <button class="btn btn-lg btn-primary btn-block" type="button" onclick="shriek.login.try_process_login()">Sign in</button>
+            </div>
+        </div>
+
         <script src="//code.jquery.com/jquery.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
     </body>

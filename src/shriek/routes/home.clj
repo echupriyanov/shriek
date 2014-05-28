@@ -13,6 +13,9 @@
             [clojure.core.async :as async :refer [<! >! put! close! go-loop]]
             [noir.response :as resp]))
 
+(defn- logf [fmt & xs]
+  (timbre/debug (apply format fmt xs)))
+
 (let [{:keys [ch-recv send-fn ajax-post-fn ajax-get-or-ws-handshake-fn
               connected-uids]}
       (sente/make-channel-socket! {})]
@@ -46,25 +49,47 @@
 (defn login-page []
   (layout/render "login.html"))
 
+(defn app []
+  (layout/render "app.html"))
+
 (defn genuuid []
   (str (java.util.UUID/randomUUID)))
 
 (defn login [u p]
   (if-let [data (db/check-user u p)]
     (do (session/put! :user data)
-      (assoc-in (resp/edn {:user u :status "OK!"}) [:session :uid] (genuuid))
+      (assoc-in (resp/edn {:user u :status :shriek/success}) [:session :uid] (genuuid))
       )
-    (resp/edn {:user u :status "Login failed!"})))
+    (resp/edn {:user u :status :shriek/failure})))
 
 (defn logout []
   (session/remove! :user)
   (resp/redirect "/"))
 
+(defn register [u]
+  (if (db/get-user (:email u))
+    (resp/edn {:result false :message "Такой пользователь уже существует!"})
+    (do (db/create-user (assoc u :role :db/user :state {:pos :top}))
+      (session/put! :user (dissoc (db/get-user (:email u)) :password))
+      (assoc-in (resp/edn {:result true}) [:session :uid] (genuuid)))))
+
 (defn access-denied []
   (layout/render "access-denied.html"))
 
-(defn app []
-  (layout/render "app.html"))
+(defn bcast-data [d]
+  (doseq [uid (:any @connected-uids)]
+    (logf "Sending updates to %s data %s" uid d)
+    (chsk-send! uid d))
+  )
+
+(defn try-create-board [b]
+  (try (do
+         (db/create-board b)
+         (bcast-data [:shriek/boards-add (db/get-board (:name b))])
+         [{:result :shriek/ok}])
+    (catch Exception e [{:result :shriek/failure :message (.getMessage e)}])
+    )
+  )
 
 (def-restricted-routes app-rroutes
   (GET "/" [] (app))
@@ -72,7 +97,7 @@
   (GET "/board/list" [] (resp/edn (db/list-boards)))
   (GET "/board/:id/list" [id] (resp/edn (db/list-stacks id)))
   (GET "/stack/:id/list" [id] (resp/edn (db/list-cards id)))
-  (POST "/board/add" [name description] (resp/edn (db/create-board {:name name :description description})))
+  (POST "/board/add" [name description] (resp/edn (try-create-board {:name name :description description})))
   (GET "/user/info" [] (resp/edn (session/get :user)))
   )
 
@@ -88,12 +113,10 @@
   (GET "/login" [] (login-page))
   (GET "/edn" [] (resp/edn {:foo 1 :bar 2}))
   (POST "/login" [user pass] (login user pass))
+  (POST "/register" [userinfo] (register userinfo))
   (GET "/logout" [] (logout))
   (GET "/about" [] (about-page))
   )
-
-(defn- logf [fmt & xs]
-  (timbre/debug (apply format fmt xs)))
 
 (defn- snt-send-boards-list [uuid]
   (chsk-send! uuid [:shriek/boards (db/list-boards)]))
@@ -120,8 +143,9 @@
            [:shriek/boards :list] (snt-send-boards-list uid)
            [:shriek/boards [:getdata board_id]] (snt-send-boards-data uid board_id)
            [:shriek/stacks [:list board_id]] (snt-send-stacks-list uid board_id)
-;;           [:shriek/boards [:add board]] (resp/edn (db/create-board {:name name :description description}))
-           ;; TODO: Match your events here, reply when appropriate <...>
+           [:shriek/boards [:add board-data]] (try-create-board)
+           ;;(?reply-fn (try-create-board board-data))
+           ;;           [:shriek/boards [:add board]] (resp/edn (db/create-board {:name name :description description}))
            :else
            (do (logf "Unmatched event: %s" ev)
              (when-not (:dummy-reply-fn? (meta ?reply-fn))
