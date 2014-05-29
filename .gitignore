@@ -16,3 +16,4 @@ pom.xml.asc
 /resources/public/js/app/
 /resources/public/js/login.js
 /resources/public/js/login/
+resources/config.clj
