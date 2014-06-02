@@ -31,7 +31,7 @@
             <div class="row" id="stack-list">
                 <div class="col-md-2 stack" id="stack">
                     <h5 class="stack-title">
-                        <a href="#"><i class="fa fa-pencil stack-edit-icon pull-right"></i></a>
+                        <a href="#" id="sl-edit-btn"><i class="fa fa-pencil stack-edit-icon pull-right"></i></a>
                         <div id="title">Sample</div>
                     </h5>
                     <ul class="list-group" id="cards">
@@ -43,9 +43,10 @@
                     <ul class="list-group">
                         <li class="list-group-item li-card">Карточка Карточка Карточка Карточка</li>
                         <li class="list-group-item card">Карточка</li>
+                        <li class="list-group-item new-card" id="new-card">Добавить карточку</li>
                     </ul>
                 </div>
-                <div class="col-md-2 stack" id="stack-new" onclick="shriek.app.stack_form()">
+                <div class="col-md-2 stack" id="stack-new">
                     <h5 class="stack-title">
                         <div id="title">Новая папка</div>
                     </h5>
@@ -75,7 +76,7 @@
                     </div>
                 </form>
             </div>
-            <div class="row container stack-add-form">
+            <div class="row container stack-add-form" id="stack-add-form">
                 <h1 class="slist-title">Добавление папки</h1>
                 <form class="form-horizontal" role="form">
                     <div class="form-group">
@@ -92,8 +93,8 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-5">
-                            <button class="btn btn-primary" type="button" onclick="shriek.app.try_create_stack()">Создать</button>
-                            <button class="btn btn-default" type="button" onclick="shriek.app.board_view()">Отмена</button>
+                            <button class="btn btn-primary" type="button" id="saf-save-btn" onclick="shriek.app.try_create_stack()">Создать</button>
+                            <button class="btn btn-default" type="button" onclick="shriek.app.stack_view()">Отмена</button>
                         </div>
                     </div>
                 </form>
@@ -104,10 +105,33 @@
                 </div>
                 <hr />
                 <div class="col-sm-offset-2 col-sm-5">
-                    <button class="btn btn-default" type="button" onclick="shriek.app.board_view">Назад</button>
-                    <button class="btn btn-primary" type="button" onclick="shriek.app.article_edit_form()">Редактировать</button>
+                    <button class="btn btn-default" type="button" onclick="shriek.app.stack_view()">Назад</button>
+                    <button class="btn btn-primary" type="button" id="av-edit-btn" onclick="shriek.app.article_edit_form()">Редактировать</button>
                     <button class="btn btn-danger" type="button" onclick="shriek.app.try_article_delete()">Удалить</button>
                 </div>
+            </div>
+            <div class="row container card-edit-form">
+                <h1 class="slist-title">Редактирование карточки</h1>
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="card-edit-title" class="col-sm-2 control-label">Заголовок</label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" id="card-edit-title" autofocus value="111" placeholder="Введите заголовок">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="card-edit-body" class="col-sm-2 control-label">Содержание<br />(Markdown)</label>
+                        <div class="col-sm-5">
+                            <textarea class="form-control" id="card-edit-body" placeholder="Содержание" rows=10>Ляля татам</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-5">
+                            <button class="btn btn-primary" type="button" id="cef-save-btn" onclick="shriek.app.try_create_stack()">Сохранить</button>
+                            <button class="btn btn-default" type="button" onclick="shriek.app.stack_view()">Отмена</button>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="row container login-form" id="login-form">
                 <h1 class="slist-title">Вход в систему</h1>

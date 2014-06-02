@@ -91,13 +91,44 @@
     )
   )
 
+(defn try-create-card [c]
+  (try (do
+         (db/add-card-to-id (:stacks_id c) c)
+         {:result true})
+    (catch Exception e {:result false :message (.getMessage e)})
+    ))
+
+(defn try-update-card [c]
+  (try (do
+         (db/update-card c)
+         {:result true})
+    (catch Exception e {:result false :message (.getMessage e)})
+    ))
+
+(defn try-create-stack [s]
+  (try (do
+         (db/add-stack-to-id (:boards_id s) s)
+         {:result true})
+    (catch Exception e {:result false :message (.getMessage e)})
+    ))
+
+(defn try-update-stack [s]
+  (try (do
+         (db/update-stack s)
+         {:result true})
+    (catch Exception e {:result false :message (.getMessage e)})
+    ))
+
 (def-restricted-routes app-rroutes
   (GET "/" [] (app))
-  (POST "/bad" [] (resp/status 401 (resp/edn "You are nasty SOB!")))
   (GET "/board/list" [] (resp/edn (db/list-boards)))
   (GET "/board/:id/list" [id] (resp/edn (db/list-stacks id)))
   (GET "/stack/:id/list" [id] (resp/edn (db/list-cards id)))
   (POST "/board/add" [name description] (resp/edn (try-create-board {:name name :description description})))
+  (POST "/card/add" [card] (resp/edn (try-create-card card)))
+  (POST "/card/update" [card] (resp/edn (try-update-card card)))
+  (POST "/stack/add" [stack] (resp/edn (try-create-stack stack)))
+  (POST "/stack/update" [stack] (resp/edn (try-update-stack stack)))
   (GET "/user/info" [] (resp/edn (session/get :user)))
   )
 

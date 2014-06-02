@@ -86,6 +86,10 @@
 (defn delete-stack [id]
   (delete stacks (where {:id id})))
 
+(defn update-stack [s]
+  (update stacks (set-fields s)
+          (where {:id (:id s)})))
+
 (defn list-stacks [id]
   (list2map (select stacks (where {:boards_id id}))))
 
@@ -106,6 +110,13 @@
   (let [stack_id (first (select stacks (where {:name stack_name})
                                 (fields :id)))]
     (insert cards (values (assoc f :stacks_id (:id stack_id))))))
+
+(defn get-card [id]
+  (first (select cards (where {:id id}))))
+
+(defn update-card [c]
+  (update cards (set-fields c)
+          (where {:id (:id c)})))
 
 (derive :db/admin :db/user)
 
@@ -190,6 +201,9 @@
   (list-cards 145)
 
   (md/md-to-html-string "#Киса куку!")
+
+  (get-card 161)
+  (update-card {:id 161 :body "ks;dkfggf"})
 
   (try (create-board {:name "112" :description "test2"})
     (catch Exception e {:status :shriek/failure :message (.getMessage e)})
